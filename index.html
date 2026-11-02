@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AlertaSegura Bayunca: plataforma de comunicación vecinal.">
+  <title>AlertaSegura Bayunca</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+
+
+  <header class="header">
+    <a href="#" class="logo" data-page="inicio">
+      <span class="logo-icon">AS</span>
+      <span>AlertaSegura <small>BAYUNCA</small></span>
+    </a>
+
+
+    <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">☰</button>
+
+
+    <nav class="navigation" id="navigation">
+      <button class="nav-link active" data-page="inicio">Inicio</button>
+      <button class="nav-link" data-page="reportes">Consultar reportes</button>
+      <button class="nav-link" data-page="crear">Crear reporte</button>
+    </nav>
+  </header>
+
+
+  <main>
+    <!-- INICIO -->
+    <section class="page active" id="inicio">
+      <div class="hero">
+        <div class="hero-content">
+          <span class="tag">SEGURIDAD Y COMUNIDAD</span>
+          <h1>La seguridad de Bayunca comienza con nosotros.</h1>
+          <p>
+            Una plataforma para comunicar situaciones de riesgo,
+            consultar reportes y fortalecer la colaboración entre vecinos.
+          </p>
+
+
+          <div class="hero-buttons">
+            <button class="btn btn-primary" data-page="crear">
+              Crear un reporte
+            </button>
+            <button class="btn btn-secondary" data-page="reportes">
+              Consultar reportes
+            </button>
+          </div>
+        </div>
+
+
+        <div class="hero-illustration">
+          <div class="illustration-circle">
+            <span>🏘️</span>
+          </div>
+          <div class="illustration-label">
+            <strong>Bayunca unida</strong>
+            <small>Comunidad y prevención</small>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="section-container">
+        <div class="section-title">
+          <span class="tag">NUESTRAS FUNCIONES</span>
+          <h2>¿Qué puedes hacer?</h2>
+          <p>Herramientas para facilitar la comunicación vecinal.</p>
+        </div>
+
+
+        <div class="cards">
+          <article class="card">
+            <div class="card-icon red">!</div>
+            <h3>Registrar situaciones</h3>
+            <p>Comunica situaciones de riesgo mediante un formulario sencillo.</p>
+            <button class="text-link" data-page="crear">Crear reporte →</button>
+          </article>
+
+
+          <article class="card">
+            <div class="card-icon green">⌕</div>
+            <h3>Consultar reportes</h3>
+            <p>Visualiza los reportes registrados en esta demostración.</p>
+            <button class="text-link" data-page="reportes">Ver reportes →</button>
+          </article>
+
+
+          <article class="card">
+            <div class="card-icon gold">✓</div>
+            <h3>Colaboración vecinal</h3>
+            <p>Promueve la prevención y el intercambio responsable de información.</p>
+            <button class="text-link" data-page="crear">Participar →</button>
+          </article>
+        </div>
+      </div>
+
+
+      <div class="notice">
+        <strong>¿Es una emergencia?</strong>
+        <p>Esta plataforma no reemplaza los canales oficiales de emergencia.</p>
+        <a href="tel:123" class="btn btn-secondary">Llamar al 123</a>
+      </div>
+    </section>
+
+
+    <!-- CONSULTA DE REPORTES -->
+    <section class="page section-container" id="reportes">
+      <div class="section-title">
+        <span class="tag">COMUNIDAD</span>
+        <h1>Reportes vecinales</h1>
+        <p>Consulta los reportes registrados en el prototipo.</p>
+      </div>
+
+
+      <div class="search-area">
+        <input
+          type="search"
+          id="searchInput"
+          placeholder="Buscar por título o sector..."
+          aria-label="Buscar reportes"
+        >
+        <select id="categoryFilter" aria-label="Filtrar por categoría">
+          <option value="">Todas las categorías</option>
+          <option value="Alumbrado público">Alumbrado público</option>
+          <option value="Actividad sospechosa">Actividad sospechosa</option>
+          <option value="Ruido">Ruido</option>
+          <option value="Otro">Otro</option>
+        </select>
+      </div>
+
+
+      <p id="reportCount" class="report-count"></p>
+      <div class="report-list" id="reportList"></div>
+      <p id="emptyMessage" class="empty-message hidden">
+        No se encontraron reportes.
+      </p>
+    </section>
+
+
+    <!-- CREAR REPORTE -->
+    <section class="page section-container" id="crear">
+      <div class="section-title">
+        <span class="tag">PARTICIPACIÓN CIUDADANA</span>
+        <h1>Registrar un reporte</h1>
+        <p>Completa la información de la situación que deseas comunicar.</p>
+      </div>
+
+
+      <div class="form-layout">
+        <form id="reportForm" class="form-card">
+          <h2>Información del reporte</h2>
+
+
+          <label for="title">Título del reporte *</label>
+          <input
+            type="text"
+            id="title"
+            maxlength="80"
+            placeholder="Ej. Luminaria dañada"
+            required
+          >
+
+
+          <label for="category">Categoría *</label>
+          <select id="category" required>
+            <option value="">Selecciona una categoría</option>
+            <option>Alumbrado público</option>
+            <option>Actividad sospechosa</option>
+            <option>Ruido</option>
+            <option>Otro</option>
+          </select>
+
+
+          <label for="sector">Sector o ubicación aproximada *</label>
+          <input
+            type="text"
+            id="sector"
+            maxlength="100"
+            placeholder="Ej. Cerca del parque del sector"
+            required
+          >
+
+
+          <label for="description">Descripción *</label>
+          <textarea
+            id="description"
+            rows="5"
+            maxlength="600"
+            placeholder="Describe brevemente lo ocurrido..."
+            required
+          ></textarea>
+
+
+          <button type="submit" class="btn btn-primary submit-button">
+            Enviar reporte
+          </button>
+
+
+          <p id="formMessage" class="form-message" role="status"></p>
+        </form>
+
+
+        <aside class="information-card">
+          <div class="card-icon green">✓</div>
+          <h3>Recomendaciones</h3>
+          <ul>
+            <li>Describe los hechos con claridad.</li>
+            <li>Indica una ubicación aproximada.</li>
+            <li>No compartas datos privados de otras personas.</li>
+            <li>No te expongas para obtener información.</li>
+          </ul>
+          <p class="small-note">
+            Este prototipo registra información de demostración
+            en la sesión actual del navegador. No envía alertas reales.
+          </p>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+
+  <footer class="footer">
+    <div class="footer-logo">
+      <span class="logo-icon">AS</span>
+      <strong>AlertaSegura Bayunca</strong>
+    </div>
+    <p>Proyecto académico · Cartagena de Indias, Colombia.</p>
+    <small>Prototipo de comunicación y prevención vecinal.</small>
+  </footer>
+
+
+</body>
+</html>
