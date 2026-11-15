@@ -1,28 +1,8 @@
+
 "use strict";
 
-
-// ALER TASEGURA BAYUNCA
-// Funciones de navegación, búsqueda y registro de reportes.
-
-
-// Reportes iniciales de ejemplo.
-let reports = [
-  {
-    title: "Luminaria dañada",
-    category: "Alumbrado público",
-    sector: "Sector de ejemplo A",
-    description: "Ejemplo ficticio de un reporte sobre alumbrado público.",
-    date: "02/11/2026"
-  },
-  {
-    title: "Situación para revisión comunitaria",
-    category: "Actividad sospechosa",
-    sector: "Sector de ejemplo B",
-    description: "Registro ficticio utilizado para probar la consulta de reportes.",
-    date: "02/11/2026"
-  }
-];
-
+// CONFIGURACIÓN DEL BACKEND
+const API_URL = "http://localhost:3000/api/reportes";
 
 // ELEMENTOS DEL DOCUMENTO
 const navigation = document.getElementById("navigation");
@@ -30,22 +10,17 @@ const menuToggle = document.getElementById("menuToggle");
 const reportForm = document.getElementById("reportForm");
 const reportList = document.getElementById("reportList");
 
-
 // NAVEGACIÓN ENTRE INTERFACES
 function showPage(pageId) {
   const selectedPage = document.getElementById(pageId);
 
-
   if (!selectedPage) return;
-
 
   document.querySelectorAll(".page").forEach(page => {
     page.classList.remove("active");
   });
 
-
   selectedPage.classList.add("active");
-
 
   document.querySelectorAll(".nav-link").forEach(button => {
     button.classList.toggle(
@@ -54,21 +29,17 @@ function showPage(pageId) {
     );
   });
 
-
   navigation.classList.remove("open");
   menuToggle.setAttribute("aria-expanded", "false");
-
 
   if (pageId === "reportes") {
     renderReports();
   }
 
-
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-
-// ACTIVAR BOTONES DE NAVEGACIÓN
+// ACTIVAR NAVEGACIÓN
 document.querySelectorAll("[data-page]").forEach(button => {
   button.addEventListener("click", event => {
     event.preventDefault();
@@ -76,156 +47,194 @@ document.querySelectorAll("[data-page]").forEach(button => {
   });
 });
 
-
-// MENÚ PARA DISPOSITIVOS MÓVILES
+// MENÚ MÓVIL
 menuToggle.addEventListener("click", () => {
   const isOpen = navigation.classList.toggle("open");
-
-
   menuToggle.setAttribute("aria-expanded", String(isOpen));
 });
 
-
-// MOSTRAR REPORTES
-function renderReports() {
-  const search = document
-    .getElementById("searchInput")
-    .value.trim()
-    .toLowerCase();
-
+// CONSULTAR REPORTES DESDE MYSQL
+async function renderReports() {
+  const search = document.getElementById("searchInput")
+    .value.trim().toLowerCase();
 
   const category = document.getElementById("categoryFilter").value;
 
+  const count = document.getElementById("reportCount");
+  const emptyMessage = document.getElementById("emptyMessage");
 
-  const filteredReports = reports.filter(report => {
-    const text = (
-      report.title + " " +
-      report.sector + " " +
-      report.description
-    ).toLowerCase();
+  reportList.innerHTML = "<p>Consultando reportes...</p>";
+  count.textContent = "";
 
+  try {
+    const response = await fetch(API_URL);
 
-    const matchesSearch = text.includes(search);
-    const matchesCategory = !category || report.category === category;
+    if (!response.ok) {
+      throw new Error("No se pudieron consultar los reportes.");
+    }
 
+    const reports = await response.json();
 
-    return matchesSearch && matchesCategory;
-  });
+    const filteredReports = reports.filter(report => {
+      const text = (
+        report.titulo + " " +
+        report.sector + " " +
+        report.descripcion
+      ).toLowerCase();
 
+      const matchesSearch = text.includes(search);
+      const matchesCategory =
+        !category || report.categoria === category;
 
-  reportList.innerHTML = "";
+      return matchesSearch && matchesCategory;
+    });
 
+    reportList.innerHTML = "";
 
-  document.getElementById("reportCount").textContent =
-    filteredReports.length + " reportes encontrados";
+    count.textContent =
+      filteredReports.length + " reportes encontrados";
 
+    emptyMessage.classList.toggle(
+      "hidden",
+      filteredReports.length > 0
+    );
 
-  document.getElementById("emptyMessage")
-    .classList.toggle("hidden", filteredReports.length > 0);
+    filteredReports.forEach(report => {
+      const card = document.createElement("article");
+      card.className = "report-card";
 
+      const categoryLabel = document.createElement("span");
+      categoryLabel.className = "report-category";
+      categoryLabel.textContent = report.categoria;
 
-  filteredReports.forEach(report => {
-    const card = document.createElement("article");
-    card.className = "report-card";
+      const title = document.createElement("h3");
+      title.textContent = report.titulo;
 
+      const description = document.createElement("p");
+      description.textContent = report.descripcion;
 
-    const categoryLabel = document.createElement("span");
-    categoryLabel.className = "report-category";
-    categoryLabel.textContent = report.category;
+      const sector = document.createElement("p");
+      sector.textContent = "Sector: " + report.sector;
 
+      const cuadrante = document.createElement("p");
+      cuadrante.textContent = "Cuadrante: " + report.cuadrante;
 
-    const title = document.createElement("h3");
-    title.textContent = report.title;
+      const estado = document.createElement("p");
+      estado.textContent = "Estado: " + report.estado;
 
+      const date = document.createElement("span");
+      date.className = "report-date";
 
-    const description = document.createElement("p");
-    description.textContent = report.description;
+      date.textContent = "Fecha: " +
+        new Date(report.fecha_creacion).toLocaleString("es-CO");
 
+      card.append(
+        categoryLabel,
+        title,
+        description,
+        sector,
+        cuadrante,
+        estado,
+        date
+      );
 
-    const sector = document.createElement("p");
-    sector.textContent = "Ubicación: " + report.sector;
+      reportList.appendChild(card);
+    });
 
+  } catch (error) {
+    console.error(error);
 
-    const date = document.createElement("span");
-    date.className = "report-date";
-    date.textContent = "Fecha: " + report.date;
+    reportList.innerHTML = "";
+    count.textContent = "";
 
-
-    card.append(categoryLabel, title, description, sector, date);
-    reportList.appendChild(card);
-  });
+    emptyMessage.classList.remove("hidden");
+    emptyMessage.textContent =
+      "No se pudieron cargar los reportes. Verifica que el servidor esté funcionando.";
+  }
 }
 
-
-// BUSCADOR Y FILTRO
+// BUSCADOR Y FILTROS
 document.getElementById("searchInput")
   .addEventListener("input", renderReports);
-
 
 document.getElementById("categoryFilter")
   .addEventListener("change", renderReports);
 
-
-// REGISTRO DE NUEVOS REPORTES
-reportForm.addEventListener("submit", event => {
+// REGISTRAR REPORTE EN MYSQL
+reportForm.addEventListener("submit", async event => {
   event.preventDefault();
 
-
-  const title = document.getElementById("title").value.trim();
-  const category = document.getElementById("category").value;
-  const sector = document.getElementById("sector").value.trim();
-  const description = document.getElementById("description").value.trim();
-
+  const titulo = document.getElementById("title").value.trim();
+  const categoria = document.getElementById("category").value;
+  const sector_id = Number(document.getElementById("sector").value);
+  const descripcion = document.getElementById("description").value.trim();
 
   const message = document.getElementById("formMessage");
-
+  const submitButton = reportForm.querySelector(
+    'button[type="submit"]'
+  );
 
   message.textContent = "";
   message.className = "form-message";
 
-
-  if (!title || !category || !sector || !description) {
+  if (!titulo || !categoria || !descripcion || !sector_id) {
     message.textContent = "Por favor, completa todos los campos.";
     message.classList.add("error");
     return;
   }
 
-
-  if (title.length < 5 || description.length < 10) {
+  if (titulo.length < 5 || descripcion.length < 10) {
     message.textContent =
       "El título debe tener 5 caracteres y la descripción 10 como mínimo.";
     message.classList.add("error");
     return;
   }
 
+  submitButton.disabled = true;
 
-  const newReport = {
-    title: title,
-    category: category,
-    sector: sector,
-    description: description,
-    date: new Date().toLocaleDateString("es-CO")
-  };
+  try {
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        titulo,
+        categoria,
+        descripcion,
+        sector_id
+      })
+    });
 
+    const result = await response.json();
 
-  reports.unshift(newReport);
+    if (!response.ok) {
+      throw new Error(result.mensaje || "No se pudo registrar el reporte.");
+    }
 
+    reportForm.reset();
 
-  reportForm.reset();
+    message.textContent = "¡Reporte registrado correctamente en la base de datos!";
+    message.classList.add("success");
 
+    await renderReports();
 
-  message.textContent = "¡Reporte registrado correctamente!";
-  message.classList.add("success");
+    setTimeout(() => {
+      showPage("reportes");
+    }, 1000);
 
+  } catch (error) {
+    console.error(error);
 
-  renderReports();
+    message.textContent =
+      error.message || "Error al conectar con el servidor.";
 
+    message.classList.add("error");
 
-  setTimeout(() => {
-    showPage("reportes");
-  }, 1000);
+  } finally {
+    submitButton.disabled = false;
+  }
 });
-
 
 // CARGAR REPORTES AL INICIAR
 renderReports();
